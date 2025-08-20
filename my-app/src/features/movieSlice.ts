@@ -27,8 +27,6 @@ const initialState: MovieState = {
   loading: false,
   error: null,
 };
-
-// Async thunk to fetch movie details
 export const fetchMovieDetails = createAsyncThunk(
   "movie/fetchDetails",
   async (id: string) => {

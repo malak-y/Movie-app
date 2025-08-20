@@ -59,7 +59,7 @@ export default function Home() {
   Dive into a World of Cinematic Wonders
 </h1>
 
-          <p className="text-lg md:text-xl mb-6 max-w-2xl">
+          <p className={`text-lg md:text-xl mb-6 max-w-2xl ${theme === "dark" ? "text-white" : "text-white"}`}>
             Explore a vast library of movies and TV shows, tailored just for you.
             Experience the magic of storytelling with CineScape.
           </p>

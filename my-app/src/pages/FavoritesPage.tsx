@@ -3,11 +3,11 @@ import type { RootState } from "../store";
 import { Link } from "react-router-dom";
 import { FaStar, FaHeart, FaSadTear, FaPlay, FaPlus } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useAppSettings } from "../context/ThemeContext"; // import context
+import { useAppSettings } from "../context/ThemeContext";
 
 export default function FavoritesPage() {
   const favorites = useSelector((state: RootState) => state.favorites.movies);
-  const { theme } = useAppSettings(); // get current theme
+  const { theme } = useAppSettings();
 
   const textColor = theme === "dark" ? "text-white" : "text-black";
   const secondaryText = theme === "dark" ? "text-gray-300" : "text-gray-700";

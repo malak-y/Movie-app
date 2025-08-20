@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaChevronLeft, FaChevronRight, FaFire, FaHeart, FaTrophy, FaCalendar, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { useAppSettings } from "../context/ThemeContext"; // <-- import context
+import { useAppSettings } from "../context/ThemeContext"; 
 
 const API_KEY = "3ce38d06cc5f12f46490e99d7965b977";
 
@@ -15,7 +15,7 @@ type Movie = {
 };
 
 export default function Movies() {
-  const { theme } = useAppSettings(); // <-- use theme context
+  const { theme } = useAppSettings(); 
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

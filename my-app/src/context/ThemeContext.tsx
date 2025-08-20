@@ -15,7 +15,7 @@ interface AppSettingsContextProps {
 const AppSettingsContext = createContext<AppSettingsContextProps | undefined>(undefined);
 
 export const AppSettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>("dark"); // default to black/dark
+  const [theme, setTheme] = useState<Theme>("dark"); 
   const [language, setLanguage] = useState<Language>("english");
 
   return (
