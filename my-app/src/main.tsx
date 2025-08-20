@@ -6,9 +6,10 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import "./index.css";
 import App from "./App";
 import { store } from "./store";
-const domain="dev-58sohelnfhto52xa.us.auth0.com";
+import { AppSettingsProvider } from "./context/ThemeContext" // import your context
 
-const clientId = "lC2PpO357H0isxvlhRff3DCxofUGPdiM";  
+const domain = "dev-58sohelnfhto52xa.us.auth0.com";
+const clientId = "lC2PpO357H0isxvlhRff3DCxofUGPdiM";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,10 +20,12 @@ createRoot(document.getElementById("root")!).render(
           clientId={clientId}
           authorizationParams={{
             redirect_uri: window.location.origin,
-            scope: "openid profile email" 
+            scope: "openid profile email",
           }}
         >
-          <App />
+          <AppSettingsProvider>
+            <App />
+          </AppSettingsProvider>
         </Auth0Provider>
       </BrowserRouter>
     </Provider>

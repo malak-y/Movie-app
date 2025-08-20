@@ -9,6 +9,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import { addFavorite, removeFavorite } from "../features/favoritesSlice";
+import { useAppSettings } from "../context/ThemeContext"; // <-- theme context
+
 const API_KEY = "3ce38d06cc5f12f46490e99d7965b977";
 
 type CastMember = { 
@@ -34,15 +36,22 @@ type Review = {
 };
 
 export default function MovieDetails() {
+  const { theme } = useAppSettings(); // <-- get theme
   const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { movie, loading, error } = useSelector((state: RootState) => state.movie);
-const favorites = useSelector((state: RootState) => state.favorites.movies);
+  const favorites = useSelector((state: RootState) => state.favorites.movies);
   const [cast, setCast] = useState<CastMember[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingAdditional, setIsLoadingAdditional] = useState(true);
- const isFavorite = movie ? favorites.some((m) => m.id === movie.id) : false;
+
+  const isFavorite = movie ? favorites.some((m) => m.id === movie.id) : false;
+
+  const bg = theme === "dark" ? "bg-[#2a1415] text-white" : "bg-white text-gray-900";
+  const cardBg = theme === "dark" ? "bg-[#3a1e1f]" : "bg-gray-100";
+  const textGray = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const smallTextGray = theme === "dark" ? "text-gray-400" : "text-gray-600";
   useEffect(() => {
     if (id) {
       dispatch(fetchMovieDetails(id));
@@ -61,7 +70,7 @@ const favorites = useSelector((state: RootState) => state.favorites.movies);
           let allReviews = firstReviewRes.data.results;
           const totalPages = firstReviewRes.data.total_pages;
           if (totalPages > 1) {
-            const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2); // pages 2..totalPages
+            const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
             const remainingRequests = remainingPages.map(page =>
               axios.get(`https://api.themoviedb.org/3/movie/${id}/reviews`, {
                 params: { api_key: API_KEY, language: "en-US", page }
@@ -93,20 +102,22 @@ const favorites = useSelector((state: RootState) => state.favorites.movies);
       };
     }
   }, [dispatch, id]);
-const handleFavorite = () => {
+
+  const handleFavorite = () => {
     if (!movie) return;
     if (isFavorite) dispatch(removeFavorite(movie.id));
     else dispatch(addFavorite(movie));
   };
+
   if (loading)
     return (
-      <div className="bg-gradient-to-b from-[#1a0c0d] to-[#2a1415] min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-white text-xl">Loading movie details...</div>
+      <div className={`${bg} min-h-screen flex items-center justify-center`}>
+        <div className="animate-pulse text-xl">Loading movie details...</div>
       </div>
     );
 
   if (error) return <p className="text-red-400 p-6">{error}</p>;
-  if (!movie) return <p className="text-white p-6">Movie not found</p>;
+  if (!movie) return <p className={`${textGray} p-6`}>Movie not found</p>;
 
   const ratingDistribution = [40, 30, 15, 10, 5];
   const reviewsCount = Math.floor(movie.vote_count / 10) * 10 || 123; 
@@ -125,11 +136,11 @@ const handleFavorite = () => {
   };
 
   return (
-    <div className="bg-[#2a1415] min-h-screen text-white">
+    <div className={`${bg} min-h-screen transition-colors duration-300`}>
       <div className="container mx-auto px-6 py-8">
         <Link
           to="/movies"
-          className="inline-flex items-center gap-2 mb-8 text-red-400 hover:text-red-300 transition-colors"
+          className={`inline-flex items-center gap-2 mb-8 ${textGray} hover:text-red-400 transition-colors`}
         >
           <FaArrowLeft /> Back to Movies
         </Link>
@@ -138,7 +149,7 @@ const handleFavorite = () => {
       <div className="container mx-auto px-6 pb-12">
         <div className="flex flex-col lg:flex-row gap-10">
           <div className="lg:w-2/5">
-            <div className="rounded-2xl overflow-hidden shadow-2xl">
+            <div className={`rounded-2xl overflow-hidden shadow-2xl ${cardBg}`}>
               <img
                 src={
                   movie.poster_path
@@ -151,44 +162,48 @@ const handleFavorite = () => {
             </div>
           </div>
           <div className="lg:w-3/5">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{movie.title}</h1>
+            <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${textGray}`}>{movie.title}</h1>
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <div className="flex items-center gap-1 text-2xl font-bold">
                   <FaStar className="text-yellow-400" /> {movie.vote_average.toFixed(1)}
                 </div>
-                <span className="text-gray-400">{reviewsCount} reviews</span>
+                <span className={`${smallTextGray}`}>{reviewsCount} reviews</span>
               </div>
               <div className="space-y-2 max-w-md">
                 {ratingDistribution.map((percent, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-8 text-right">{5-index}★</div>
-                    <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-red-600" 
                         style={{ width: `${percent}%` }}
                       ></div>
                     </div>
-                    <div className="w-10 text-right text-gray-400">{percent}%</div>
+                    <div className={`w-10 text-right ${smallTextGray}`}>{percent}%</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="h-px bg-gray-800 my-8"></div>
+            <div className={`h-px ${textGray} my-8`}></div>
+
             {videos.length > 0 && (
               <a
                 href={`https://www.youtube.com/watch?v=${videos[0].key}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-full mb-8 transition-colors"
+                className={`inline-flex items-center gap-3 px-6 py-3 rounded-full mb-8 transition-colors ${
+                  theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-600 hover:bg-red-700"
+                }`}
               >
                 <FaPlay /> Play Trailer
               </a>
             )}
+
             {!isLoadingAdditional && cast.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Cast</h2>
+                <h2 className={`text-xl font-semibold mb-4 ${textGray}`}>Cast</h2>
                 <Slider {...castSliderSettings}>
                   {cast.map((person) => (
                     <div key={person.id} className="flex flex-col items-center px-2">
@@ -201,16 +216,17 @@ const handleFavorite = () => {
                         alt={person.name}
                         className="w-24 h-32 object-cover rounded-lg"
                       />
-                      <span className="text-center text-sm mt-1">{person.name}</span>
-                      <span className="text-gray-300 text-xs">{person.character}</span>
+                      <span className={`${textGray} text-center text-sm mt-1`}>{person.name}</span>
+                      <span className={`${smallTextGray} text-xs`}>{person.character}</span>
                     </div>
                   ))}
                 </Slider>
               </div>
             )}
+
             {!isLoadingAdditional && videos.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Related Videos</h2>
+                <h2 className={`text-xl font-semibold mb-4 ${textGray}`}>Related Videos</h2>
                 <div className="flex flex-wrap gap-3">
                   {videos.map((video) => (
                     <a
@@ -225,69 +241,72 @@ const handleFavorite = () => {
                         alt={video.name}
                         className="w-48 h-28 object-cover rounded-lg"
                       />
-                      <span className="text-center text-sm">{video.name}</span>
+                      <span className={`${textGray} text-center text-sm`}>{video.name}</span>
                     </a>
                   ))}
                 </div>
               </div>
             )}
+
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Synopsis</h2>
-              <p className="text-gray-300 leading-relaxed">
+              <h2 className={`text-xl font-semibold mb-4 ${textGray}`}>Synopsis</h2>
+              <p className={`${textGray} leading-relaxed`}>
                 {movie.overview || "No synopsis available."}
               </p>
             </div>
+
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div>
-                <h3 className="text-sm text-gray-200 mb-1">Release Date</h3>
+                <h3 className={`text-sm mb-1 ${textGray}`}>Release Date</h3>
                 <p>{movie.release_date}</p>
               </div>
               <div>
-                <h3 className="text-sm text-gray-200 mb-1">Duration</h3>
+                <h3 className={`text-sm mb-1 ${textGray}`}>Duration</h3>
                 <p>{movie.runtime} min</p>
               </div>
               <div>
-                <h3 className="text-sm text-gray-200 mb-1">Rating</h3>
+                <h3 className={`text-sm mb-1 ${textGray}`}>Rating</h3>
                 <p className="flex items-center gap-1">
                   <FaStar className="text-yellow-400" /> {movie.vote_average.toFixed(1)}/10
                 </p>
               </div>
               <div>
-                <h3 className="text-sm text-gray-200 mb-1">Genres</h3>
+                <h3 className={`text-sm mb-1 ${textGray}`}>Genres</h3>
                 <div className="flex flex-wrap gap-1">
                   {movie.genres.map((g) => (
-                    <span key={g.id} className="text-sm">
-                      {g.name}
-                    </span>
+                    <span key={g.id} className="text-sm">{g.name}</span>
                   ))}
                 </div>
               </div>
             </div>
+
             {!isLoadingAdditional && reviews.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+                <h2 className={`text-xl font-semibold mb-4 ${textGray}`}>Reviews</h2>
                 <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                   {reviews.map((review) => (
-                    <div key={review.id} className="bg-[#3a1e1f] p-4 rounded-lg">
-                      <p className="text-gray-400 text-sm mb-2">
+                    <div key={review.id} className={`${cardBg} p-4 rounded-lg`}>
+                      <p className={`${smallTextGray} text-sm mb-2`}>
                         <span className="font-semibold">{review.author}</span> - {new Date(review.created_at).toLocaleDateString()}
                       </p>
-                      <p className="text-gray-300 text-sm">{review.content}</p>
+                      <p className={`${textGray} text-sm`}>{review.content}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
             <button
               onClick={handleFavorite}
               className={`flex items-center gap-3 border px-6 py-3 rounded-full transition-colors ${
                 isFavorite
                   ? "bg-red-500 text-white border-red-500"
-                  : "border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                  : `border-red-500 ${theme === "dark" ? "text-red-400 hover:bg-red-500 hover:text-white" : "text-red-600 hover:bg-red-600 hover:text-white"}`
               }`}
             >
               <FaHeart /> {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
             </button>
+
           </div>
         </div>
       </div>

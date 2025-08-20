@@ -5,6 +5,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 const API_KEY = "3ce38d06cc5f12f46490e99d7965b977";
 
 export type Movie = {
+  vote_count: number;
   id: number;
   title: string;
   poster_path: string;

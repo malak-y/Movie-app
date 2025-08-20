@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaChevronLeft, FaChevronRight, FaFire, FaHeart, FaTrophy, FaCalendar, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useAppSettings } from "../context/ThemeContext"; // <-- import context
+
 const API_KEY = "3ce38d06cc5f12f46490e99d7965b977";
 
 type Movie = {
@@ -13,6 +15,7 @@ type Movie = {
 };
 
 export default function Movies() {
+  const { theme } = useAppSettings(); // <-- use theme context
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -49,10 +52,12 @@ export default function Movies() {
 
   if (loading) {
     return (
-      <div className="bg-[#2a1415] min-h-screen flex items-center justify-center">
+      <div className={`${theme === "dark" ? "bg-[#2a1415]" : "bg-white"} min-h-screen flex items-center justify-center`}>
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-12 w-12 rounded-full bg-red-600 mb-4"></div>
-          <div className="text-white text-xl">Loading movies...</div>
+          <div className={`${theme === "dark" ? "text-white" : "text-gray-900"} text-xl`}>
+            Loading movies...
+          </div>
         </div>
       </div>
     );
@@ -62,14 +67,19 @@ export default function Movies() {
     movie.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const bg = theme === "dark" ? "bg-[#2a1415] text-white" : "bg-white text-gray-900";
+  const cardBg = theme === "dark" ? "bg-[#3a1e1f]" : "bg-gray-100";
+  const hoverBg = theme === "dark" ? "hover:bg-[#4a2a2b]" : "hover:bg-gray-200";
+  const inputBg = theme === "dark" ? "bg-[#3a1e1f] text-white placeholder-gray-500" : "bg-gray-100 text-gray-900 placeholder-gray-500";
+
   return (
-    <div className="bg-[#2a1415] min-h-screen text-white px-4 py-8 md:px-8 md:py-12">
+    <div className={`${bg} min-h-screen px-4 py-8 md:px-8 md:py-12 transition-colors duration-300`}>
       <header className="mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent mb-2">
           Movies
         </h1>
         <div className="w-20 h-1 bg-red-600 mx-auto mb-4"></div>
-        <p className="mt-3 text-gray-300 max-w-2xl mx-auto text-sm md:text-base">
+        <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mt-3 max-w-2xl mx-auto text-sm md:text-base`}>
           Discover the finest collection of films
         </p>
 
@@ -82,11 +92,11 @@ export default function Movies() {
             placeholder="Search movies..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 pl-12 rounded-full bg-[#3a1e1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:shadow-lg transition-all duration-300 transform hover:scale-105"
+            className={`w-full p-3 pl-12 rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 focus:shadow-lg transition-all duration-300 transform hover:scale-105 ${inputBg}`}
           />
         </div>
-
       </header>
+
       <div className="flex flex-wrap justify-center gap-3 mb-12">
         {[
           { key: "trending", label: "Trending", icon: <FaFire className="mr-2" /> },
@@ -97,9 +107,9 @@ export default function Movies() {
           <button
             key={key}
             className={`px-5 py-3 rounded-full font-medium transition-all duration-300 flex items-center ${filter === key
-                ? "bg-red-600 shadow-lg shadow-red-900/30 transform -translate-y-1"
-                : "bg-[#3a1e1f] hover:bg-[#4a2a2b]"
-              }`}
+              ? "bg-red-600 shadow-lg shadow-red-900/30 transform -translate-y-1"
+              : `${cardBg} ${hoverBg}`
+            }`}
             onClick={() => {
               setFilter(key);
               setPage(1);
@@ -109,18 +119,19 @@ export default function Movies() {
           </button>
         ))}
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
         {filteredMovies.length === 0 ? (
-          <p className="text-gray-400 col-span-full text-center mt-10">
+          <p className={`${theme === "dark" ? "text-gray-400" : "text-gray-700"} col-span-full text-center mt-10`}>
             No movies found
           </p>
         ) : (
           filteredMovies.map((movie) => (
             <div
               key={movie.id}
-              className="bg-[#3a1e1f] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group relative"
+              className={`${cardBg} rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group relative`}
             >
-              <div className="h-80 overflow-hidden flex items-center justify-center  p-4">
+              <div className="h-80 overflow-hidden flex items-center justify-center p-4">
                 <img
                   src={
                     movie.poster_path
@@ -164,7 +175,7 @@ export default function Movies() {
 
       <div className="flex justify-center items-center gap-4">
         <button
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#3a1e1f] rounded-full hover:bg-[#4a2a2b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-[#4a2a2b]"
+          className={`${cardBg} flex items-center gap-2 px-5 py-2.5 rounded-full hover:${hoverBg} disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-[#4a2a2b]`}
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
         >
@@ -175,18 +186,18 @@ export default function Movies() {
           {page > 2 && <span className="px-2 text-gray-400">...</span>}
           {page > 1 && (
             <button
-              className="w-10 h-10 rounded-full bg-[#3a1e1f] hover:bg-[#4a2a2b] transition-colors"
+              className={`${cardBg} w-10 h-10 rounded-full hover:${hoverBg} transition-colors`}
               onClick={() => setPage(page - 1)}
             >
               {page - 1}
             </button>
           )}
-          <button className="w-10 h-10 rounded-full bg-red-600 shadow-md">
+          <button className={`${cardBg} w-10 h-10 rounded-full bg-red-600 shadow-md`}>
             {page}
           </button>
           {page < totalPages && (
             <button
-              className="w-10 h-10 rounded-full bg-[#3a1e1f] hover:bg-[#4a2a2b] transition-colors"
+              className={`${cardBg} w-10 h-10 rounded-full hover:${hoverBg} transition-colors`}
               onClick={() => setPage(page + 1)}
             >
               {page + 1}
@@ -196,7 +207,7 @@ export default function Movies() {
         </div>
 
         <button
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#3a1e1f] rounded-full hover:bg-[#4a2a2b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-[#4a2a2b]"
+          className={`${cardBg} flex items-center gap-2 px-5 py-2.5 rounded-full hover:${hoverBg} disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-[#4a2a2b]`}
           onClick={() => setPage((prev) => prev + 1)}
           disabled={page === totalPages}
         >
@@ -206,4 +217,3 @@ export default function Movies() {
     </div>
   );
 }
-
