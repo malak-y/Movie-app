@@ -18,6 +18,7 @@ export default function Navbar() {
   const { theme, setTheme } = useAppSettings();
 
   const isActive = (path: string) => location.pathname === path;
+
   const navBg =
     theme === "dark"
       ? "bg-gradient-to-r from-[#2a1415] to-[#3a1e1f]"
@@ -69,7 +70,9 @@ export default function Navbar() {
         </Link>
       </div>
       <div
-        className={`flex-col md:flex md:flex-row md:space-x-8 absolute md:static left-0 top-0 h-screen md:h-auto w-3/4 md:w-auto transition-transform duration-300 z-50 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 ${menuBg} border-r md:border-0 ${borderColor}`}
+        className={`flex-col md:flex md:flex-row md:space-x-8 absolute md:static left-0 top-0 h-screen md:h-auto w-3/4 md:w-auto transition-transform duration-300 z-50 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 ${menuBg} border-r md:border-0 ${borderColor}`}
       >
         <div className="flex flex-col md:flex-row md:items-center mt-20 md:mt-0">
           <Link
@@ -105,23 +108,26 @@ export default function Navbar() {
             />
             <span className="font-medium">Movies</span>
           </Link>
+          <button
+            className={`md:hidden px-6 py-4 flex items-center space-x-2 transition-all duration-300 group ${buttonText} ${menuHover}`}
+            onClick={() => {
+              navigate("/favorites");
+              setIsOpen(false);
+            }}
+          >
+            <FaRegBookmark className="text-red-400" />
+            <span className="font-medium">Favorites</span>
+          </button>
         </div>
       </div>
       <div className="flex items-center space-x-4">
         <button
-          className={`relative group flex items-center space-x-2 ${buttonBg} ${buttonHover} px-4 py-2 rounded-xl transition-all duration-300 border ${borderColor} hover:border-red-500/30`}
-          onClick={() => {
-            navigate("/favorites");
-            setIsOpen(false);
-          }}
+          className={`hidden md:flex relative group items-center space-x-2 ${buttonBg} ${buttonHover} px-4 py-2 rounded-xl transition-all duration-300 border ${borderColor} hover:border-red-500/30`}
+          onClick={() => navigate("/favorites")}
           title="My Favorites"
         >
           <FaRegBookmark className="text-red-400 group-hover:text-red-300 transition-colors" />
-          <span
-            className={`text-sm font-medium ${buttonText} hidden md:block`}
-          >
-            Favorites
-          </span>
+          <span className={`text-sm font-medium ${buttonText}`}>Favorites</span>
         </button>
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
