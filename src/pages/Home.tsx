@@ -1,46 +1,12 @@
-import { FaFilm, FaMobileAlt, FaListUl, FaDownload, FaStar } from "react-icons/fa";
-import Slider from "react-slick";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { FaFilm, FaMobileAlt, FaListUl, FaDownload, FaUsers, FaHeart, FaAward } from "react-icons/fa";
 import bgImage from "../assets/bg.png";
 import { Link } from "react-router-dom";
 import { useAppSettings } from "../context/ThemeContext";
 
-const API_KEY = "3ce38d06cc5f12f46490e99d7965b977";
 
 export default function Home() {
   const { theme } = useAppSettings();
-  const [movies, setMovies] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/trending/movie/week`,
-          { params: { api_key: API_KEY } }
-        );
-        setMovies(response.data.results);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchMovies();
-  }, []);
-
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
-  };
+  
 
   const bg = theme === "dark" ? "bg-[#2a1415] text-white" : "bg-white text-gray-900";
   const cardBg = theme === "dark" ? "bg-[#3a1e1f]" : "bg-gray-100";
@@ -118,34 +84,45 @@ export default function Home() {
       </section>
 
       <section className="px-6 py-16 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-semibold mb-4">Trending Now</h2>
+        <h2 className="text-2xl font-semibold mb-4">Why Choose CineScape</h2>
         <h3 className="text-3xl md:text-4xl font-extrabold mb-6">
-          Movies Everyone is Talking About
+          The Ultimate Streaming Experience
         </h3>
+        <p className={`${textGray} mb-12 max-w-2xl`}>
+          Discover why millions of users trust CineScape for their entertainment needs.
+        </p>
 
-        {movies.length > 0 ? (
-          <Slider {...settings}>
-            {movies.map((movie) => (
-              <div key={movie.id} className="p-2">
-                <div className={`${cardBg} rounded-xl overflow-hidden shadow-md transition ${hoverBg}`}>
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                    alt={movie.title}
-                    className="w-full h-64 object-cover"
-                  />
-                  <div className="p-4">
-                    <h4 className="text-lg font-semibold">{movie.title}</h4>
-                    <p className={`${smallTextGray} text-sm flex items-center gap-2`}>
-                      <FaStar className="text-yellow-400" /> {movie.vote_average}/10
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className={`${smallTextGray}`}>Loading trending movies...</p>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className={`${cardBg} p-8 rounded-xl shadow-md transition ${hoverBg} flex flex-col items-center text-center`}>
+            <div className="bg-red-100 p-4 rounded-full mb-4">
+              <FaUsers className="text-red-600 text-2xl" />
+            </div>
+            <h4 className="text-xl font-semibold mb-3">Community Driven</h4>
+            <p className={`${smallTextGray} text-sm`}>
+              Join a vibrant community of movie enthusiasts who share reviews, recommendations, and curated lists.
+            </p>
+          </div>
+
+          <div className={`${cardBg} p-8 rounded-xl shadow-md transition ${hoverBg} flex flex-col items-center text-center`}>
+            <div className="bg-red-100 p-4 rounded-full mb-4">
+              <FaHeart className="text-red-600 text-2xl" />
+            </div>
+            <h4 className="text-xl font-semibold mb-3">Personalized For You</h4>
+            <p className={`${smallTextGray} text-sm`}>
+              Our advanced algorithm learns your preferences to suggest content you'll truly love.
+            </p>
+          </div>
+
+          <div className={`${cardBg} p-8 rounded-xl shadow-md transition ${hoverBg} flex flex-col items-center text-center`}>
+            <div className="bg-red-100 p-4 rounded-full mb-4">
+              <FaAward className="text-red-600 text-2xl" />
+            </div>
+            <h4 className="text-xl font-semibold mb-3">Award-Winning Content</h4>
+            <p className={`${smallTextGray} text-sm`}>
+              Access critically acclaimed films and exclusive originals that have earned industry recognition.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   );
