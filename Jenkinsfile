@@ -28,7 +28,7 @@ pipeline {
                 sh """
                     docker stop ${APP_NAME} || true
                     docker rm ${APP_NAME} || true
-                    docker run -d -p 8080:80 --name ${APP_NAME} ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker run -d -p 3000:80 --name ${APP_NAME} ${DOCKER_IMAGE}:${DOCKER_TAG}
                 """
             }
         }
