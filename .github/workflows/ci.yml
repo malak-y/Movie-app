@@ -1,13 +1,11 @@
-name: CI - Movie Reservation System
+name: CI/CD - Movie Reservation System
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +14,8 @@ jobs:
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
-        
+        with:
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
@@ -27,8 +26,21 @@ jobs:
       - name: Build Project
         run: npm run build
 
-      - name: Build Docker Image
-        run: docker build -t movie-reservation-system .
+      # Create deployment package (exclude .git folder)
+      - name: Create deployment package
+        run: zip -r deploy.zip . -x '*.git*'
 
-      - name: Run Docker Container
-        run: docker run -d -p 8080:80 movie-reservation-system
+      # Deploy to Elastic Beanstalk
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v20
+        with: 
+        # From Users 
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        # From Beanstalk
+          application_name: first
+          environment_name: First-env
+
+          region: eu-north-1 # from benstalk domain First-env.eba-3wm7mmcj.eu-north-1.elasticbeanstalk.com
+          version_label: ${{ github.sha }}  # random version label
+          deployment_package: deploy.zip
