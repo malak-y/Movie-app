@@ -28,7 +28,8 @@ jobs:
 
       # Create deployment package (exclude .git folder)
       - name: Create deployment package
-        run: zip -r deploy.zip . -x '*.git*'
+        run: zip -r deploy.zip Dockerfile nginx.conf package*.json dist .ebextensions -x '*.git*' '.github*' 'node_modules*'
+
 
       # Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
