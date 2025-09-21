@@ -1,4 +1,4 @@
-name: CI/CD - React App
+name: CI/CD - Movie Reservation System
 
 on:
   push:
@@ -9,42 +9,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20' # your Node.js version
+          node-version: '18'
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Run tests
       - name: Run Tests
         run: npm test
 
-      # 5️⃣ Build project
       - name: Build Project
         run: npm run build
 
-      # 6️⃣ Create deployment package
+      # Create deployment package (exclude .git folder)
       - name: Create deployment package
-        run: |
-          zip -r deploy.zip Dockerfile nginx.conf package*.json build .ebextensions \
-          -x '*.git*' '.github*' 'node_modules*'
+        run: zip -r deploy.zip Dockerfile nginx.conf package*.json dist .ebextensions -x '*.git*' '.github*' 'node_modules*'
 
-      # 7️⃣ Deploy to Elastic Beanstalk
+
+      # Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v20
-        with:
+        with: 
+        # From Users 
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: MyReactApp        # your EB app name
-          environment_name: MyReactApp-env    # your EB environment
-          region: eu-north-1                  # EB region
-          version_label: ${{ github.sha }}    # unique version
+        # From Beanstalk
+          application_name: first
+          environment_name: First-env
+
+          region: eu-north-1 # from benstalk domain First-env.eba-3wm7mmcj.eu-north-1.elasticbeanstalk.com
+          version_label: ${{ github.sha }}  # random version label
           deployment_package: deploy.zip
